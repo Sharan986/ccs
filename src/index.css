@@ -1,141 +1,125 @@
-@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;700;800;900&family=Inter:wght@300;400;500;600&display=swap');
-
 @import "tailwindcss";
 
 @theme {
-  --color-neon: #39ff14;
-  --color-neon-dim: #28cc0f;
-  --color-bg: #111111;
-  --color-surface: #1a1a1a;
-  --color-border: #242424;
-  --color-muted: #606060;
-  --color-panel-bento1: #0d1f12;
-  --color-panel-bento2: #12121e;
-  --color-panel-parallax: #0a1a08;
-  --color-panel-transition: #101e10;
-  --color-panel-cta: #0d0d1f;
-  --color-card-green: #0e2217;
-  --color-card-purple: #140e28;
-  --color-card-teal: #081820;
-  --font-display: 'Barlow Condensed', sans-serif;
-  --font-body: 'Inter', sans-serif;
+  --font-sans: "Space Mono", monospace;
+  --font-serif: "Space Mono", monospace;
+  --font-mono: "Space Mono", monospace;
+  --color-accent: #c084fc;
+  --color-accent-secondary: #818cf8;
 }
 
-*, *::before, *::after { box-sizing: border-box; }
-html { scroll-behavior: auto; }
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
-body {
-  background: #111111;
-  color: #f0f0f0;
-  font-family: var(--font-body);
+html, body {
+  background: #000;
+  color: #fff;
   overflow-x: hidden;
+  overflow-y: auto;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-a { text-decoration: none; color: inherit; }
-
-/* ─── Scroll-stacking system ─── */
-.scroll-wrapper { position: relative; }
-
-.panel {
-  position: sticky;
-  top: 0;
-  height: 100vh;
+/* ── Lenis ────────────────────────────────────── */
+html.lenis, html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+.lenis.lenis-stopped {
   overflow: hidden;
-  /* Rounded bottom so next section slides over with card-edge */
-  border-radius: 0 0 28px 28px;
 }
-
-/* ─── Hero grid pattern ─── */
-.grid-bg {
-  position: absolute;
-  inset: 0;
-  background-image:
-    linear-gradient(rgba(57, 255, 20, 0.035) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(57, 255, 20, 0.035) 1px, transparent 1px);
-  background-size: 64px 64px;
-  mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, black 25%, transparent 100%);
+.lenis.lenis-scrolling iframe {
   pointer-events: none;
 }
 
-/* ─── Neon glow ─── */
-.neon-glow {
-  text-shadow: 0 0 24px rgba(57, 255, 20, 0.6), 0 0 80px rgba(57, 255, 20, 0.2);
+/* ── Glassmorphism Panel ──────────────────────── */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+}
+.glass-panel-hover {
+  transition: border-color 0.5s ease, box-shadow 0.5s ease, background 0.5s ease;
+}
+.glass-panel-hover:hover {
+  border-color: rgba(255, 255, 255, 0.18);
+  box-shadow: 0 0 40px rgba(192, 132, 252, 0.06);
+  background: rgba(255, 255, 255, 0.06);
 }
 
-/* ─── Bento 3-column flex layout ─── */
-.bento-flex {
-  display: flex;
-  gap: 12px;
-  height: calc(100vh - 10rem);
+/* ── Text Scrim (bottom-to-top dark gradient) ── */
+.text-scrim {
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.4) 50%, transparent 100%);
+}
+.text-scrim-full {
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.5) 60%, transparent 100%);
 }
 
-.bento-col {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  flex: 1;
-}
-
-.bento-col-center {
-  flex: 1;
-}
-
-/* ─── Code rain bg ─── */
-.code-rain-bg {
+/* ── Video Dimmer ─────────────────────────────── */
+.video-dimmer {
   position: absolute;
   inset: 0;
-  overflow: hidden;
-  opacity: 0.06;
-  font-family: 'Courier New', monospace;
-  font-size: 0.72rem;
-  line-height: 1.7;
-  color: #39ff14;
-  white-space: pre;
+  background: rgba(0, 0, 0, 0.40);
   pointer-events: none;
-  user-select: none;
 }
 
-/* ─── ISO card ─── */
-.iso-perspective { perspective: 1200px; }
-.iso-card { transform-style: preserve-3d; will-change: transform; }
-
-/* ─── Stack overlay card ─── */
-.stack-overlay {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  will-change: clip-path, transform;
+/* ── Accent border left ───────────────────────── */
+.accent-left-border {
+  border-left: 2px solid rgba(192, 132, 252, 0.30);
 }
 
-/* ─── Keyframes ─── */
-@keyframes blink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0; }
+/* ── Form Inputs ──────────────────────────────── */
+.form-input {
+  width: 100%;
+  height: 56px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 0 20px;
+  color: #fff;
+  font-size: 14px;
+  font-family: "Space Mono", monospace;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+  outline: none;
+}
+.form-input:focus {
+  border-color: rgba(192, 132, 252, 0.50);
+  box-shadow: 0 0 0 3px rgba(192, 132, 252, 0.10);
+  background: rgba(255, 255, 255, 0.06);
+}
+.form-input::placeholder {
+  color: rgba(255, 255, 255, 0.25);
+}
+.form-textarea {
+  height: auto;
+  padding: 16px 20px;
+  resize: none;
 }
 
-@keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-16px); }
+/* ── Scrollbar suppression ────────────────────── */
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
 }
 
-@keyframes glow-pulse {
-  0%, 100% { box-shadow: 0 0 18px rgba(57,255,20,0.18), 0 0 40px rgba(57,255,20,0.05); }
-  50% { box-shadow: 0 0 45px rgba(57,255,20,0.55), 0 0 90px rgba(57,255,20,0.15); }
+/* ── Scroll Indicator Pulse ───────────────────── */
+@keyframes pulse-down {
+  0%, 100% { opacity: 0.3; transform: translateY(0); }
+  50% { opacity: 0.7; transform: translateY(6px); }
 }
-
-@keyframes marquee {
-  from { transform: translateX(0); }
-  to { transform: translateX(-50%); }
+.scroll-indicator {
+  animation: pulse-down 2.5s ease-in-out infinite;
 }
-
-.cursor-blink { color: #39ff14; animation: blink 1s steps(1) infinite; }
-.floating { animation: float 5s ease-in-out infinite; }
-.glow-pulse { animation: glow-pulse 3s ease-in-out infinite; }
-.marquee-track { animation: marquee 22s linear infinite; }
-
-/* ─── Scrollbar ─── */
-::-webkit-scrollbar { width: 4px; }
-::-webkit-scrollbar-track { background: #111; }
-::-webkit-scrollbar-thumb { background: #28cc0f; border-radius: 2px; }
