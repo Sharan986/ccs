@@ -6,27 +6,27 @@ import { ScrambleIn } from './components/ScrambleIn';
 import { CCSLogo } from './components/CCSLogo';
 
 /* ── Video URLs ─────────────────────────────────────────────── */
-const HERO_VID    = "https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260622_083515_290e5a10-0b95-41af-a5e2-32b6389baa4d.mp4";
-const ABOUT_VID   = "https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260622_092455_089c54f8-3b03-4966-9df1-e9746063d0ef.mp4";
-const SOE_VID     = "https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260622_095810_ecea3dd2-fc5e-4e41-8696-4219290b6589.mp4";
-const EVENTS_VID  = "https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260622_095750_32a52ce0-2005-45c9-9093-41f03fde9530.mp4";
-const FOOTER_VID  = "https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260622_080203_fd7f4f85-3a86-4837-8192-85e7bfe68e75.mp4";
+const HERO_VID = "https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260622_083515_290e5a10-0b95-41af-a5e2-32b6389baa4d.mp4";
+const ABOUT_VID = "https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260622_092455_089c54f8-3b03-4966-9df1-e9746063d0ef.mp4";
+const SOE_VID = "https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260622_095810_ecea3dd2-fc5e-4e41-8696-4219290b6589.mp4";
+const EVENTS_VID = "https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260622_095750_32a52ce0-2005-45c9-9093-41f03fde9530.mp4";
+const FOOTER_VID = "https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260622_080203_fd7f4f85-3a86-4837-8192-85e7bfe68e75.mp4";
 
 /* ── Static Data ────────────────────────────────────────────── */
 const MEMBERS = [
-  { name: "Sharan Kumar",   role: "President",         initial: "SK" },
-  { name: "Ankit Singh",    role: "Vice President",    initial: "AS" },
-  { name: "Priya Sharma",   role: "Tech Lead",         initial: "PS" },
-  { name: "Ravi Mehta",     role: "Event Coordinator", initial: "RM" },
-  { name: "Sneha Das",      role: "Design Head",       initial: "SD" },
-  { name: "Vikram Yadav",   role: "Secretary",         initial: "VY" },
+  { name: "NA", role: "President", initial: "SK" },
+  { name: "Ankit Singh", role: "Vice President", initial: "AS" },
+  { name: "Priya Sharma", role: "Tech Lead", initial: "PS" },
+  { name: "Ravi Mehta", role: "Event Coordinator", initial: "RM" },
+  { name: "Sneha Das", role: "Design Head", initial: "SD" },
+  { name: "Vikram Yadav", role: "Secretary", initial: "VY" },
 ];
 
 const EVENTS = [
-  { title: "Hackathon 2026",     date: "Aug 15 — 16",   desc: "48-hour build sprint. Ship or sink." },
-  { title: "Code & Coffee",      date: "Every Saturday", desc: "Weekly peer-programming sessions over caffeine." },
-  { title: "AI Workshop Series", date: "Sep 5 — 20",    desc: "From neural nets to deployment — a 3-week deep dive." },
-  { title: "Tech Talk: Systems", date: "Oct 12",        desc: "Guest lecture on distributed systems at scale." },
+  { title: "Hackathon 2026", date: "Aug 15 — 16", desc: "48-hour build sprint. Ship or sink." },
+  { title: "Code & Coffee", date: "Every Saturday", desc: "Weekly peer-programming sessions over caffeine." },
+  { title: "AI Workshop Series", date: "Sep 5 — 20", desc: "From neural nets to deployment — a 3-week deep dive." },
+  { title: "Tech Talk: Systems", date: "Oct 12", desc: "Guest lecture on distributed systems at scale." },
 ];
 
 const GALLERY_IMAGES = [
@@ -49,9 +49,9 @@ function App() {
   const aboutRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: aboutRef, offset: ["start end", "end start"] });
   const smoothProgress = useSpring(scrollYProgress, { stiffness: 15, damping: 32, mass: 1.8 });
-  const yTransform      = useTransform(smoothProgress, [0, 1], [60, -120]);
-  const transformTpl    = useMotionTemplate`rotateX(24deg) translateY(${yTransform}px) translateZ(15px)`;
-  const aboutOpacity    = useTransform(smoothProgress, [0.3, 0.5], [0, 1]);
+  const yTransform = useTransform(smoothProgress, [0, 1], [60, -120]);
+  const transformTpl = useMotionTemplate`rotateX(24deg) translateY(${yTransform}px) translateZ(15px)`;
+  const aboutOpacity = useTransform(smoothProgress, [0.3, 0.5], [0, 1]);
 
   /* ── Lenis + entrance timer ───────────────────────────────── */
   useEffect(() => {
@@ -147,12 +147,12 @@ function App() {
           <h2
             className="uppercase font-['Anton_SC'] whitespace-nowrap leading-none select-none opacity-[0.07]"
             style={{
-              fontSize: 'clamp(120px, 30vw, 521px)', letterSpacing: '-4px',
+              fontSize: 'clamp(120px, 30vw, 521px)', letterSpacing: '50px',
               background: 'radial-gradient(circle, rgba(142,127,148,0) 0%, #8E7F94 70%)',
               backgroundClip: 'text', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', color: 'transparent',
               willChange: 'opacity',
             }}
-          >TRANSCENDENCE</h2>
+          >CCS</h2>
         </div>
 
         {/* Bottom scrim for text legibility */}
@@ -244,9 +244,9 @@ function App() {
           {/* Stats cards in glass panels */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-5 w-full max-w-4xl">
             {[
-              { value: "500+",  label: "Students Enrolled" },
-              { value: "12+",   label: "Faculty Members" },
-              { value: "30+",   label: "Industry Partners" },
+              { value: "500+", label: "Students Enrolled" },
+              { value: "12+", label: "Faculty Members" },
+              { value: "30+", label: "Industry Partners" },
             ].map((m, i) => (
               <motion.div
                 key={i}
@@ -404,9 +404,8 @@ function App() {
               whileInView={{ y: 0, opacity: 1 }}
               viewport={{ once: true, amount: 0.05 }}
               transition={{ duration: 0.7, delay: 0.06 * i }}
-              className={`group relative overflow-hidden rounded-lg cursor-pointer ${
-                i === 0 ? 'col-span-2 row-span-2' : ''
-              }`}
+              className={`group relative overflow-hidden rounded-lg cursor-pointer ${i === 0 ? 'col-span-2 row-span-2' : ''
+                }`}
             >
               <img
                 src={img.url}
