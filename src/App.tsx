@@ -753,18 +753,18 @@ function App() {
           </div>
 
           {/* Right: content */}
-          <div className="w-full md:w-1/2 flex flex-col justify-between px-8 py-10 sm:px-14 sm:py-14 lg:px-20 lg:py-16">
-            <div>
-              <div className="flex items-center gap-2.5 mb-8">
+          <div className="w-full md:w-1/2 flex flex-col items-center justify-center gap-8 px-8 py-10 sm:px-14 sm:py-14 lg:px-20 lg:py-16">
+            <div className="flex flex-col items-center text-center gap-6">
+              <div className="flex items-center gap-2.5">
                 <CCSLogo className="w-[18px] h-[18px] text-white/60" />
                 <span className="text-white/60 text-[15px] font-medium tracking-tight">CCS</span>
               </div>
-              <p className="text-white/35 text-[14px] sm:text-[15px] leading-relaxed max-w-sm mb-10">
+              <p className="text-white/35 text-[14px] sm:text-[15px] leading-relaxed max-w-sm">
                 Code and Compute Society — the tech club of Arka Jain University. Built for those who refuse to be limited by the classroom alone.
               </p>
 
               {/* Footer nav links */}
-              <div className="flex flex-wrap gap-x-6 gap-y-2">
+              <div className="flex flex-wrap justify-center gap-x-6 gap-y-2">
                 {['About', 'Events', 'Gallery', 'Suggestions'].map(link => (
                   <button
                     key={link}
@@ -780,7 +780,7 @@ function App() {
               </div>
             </div>
 
-            <div className="mt-12 text-white/20 text-[12px]">
+            <div className="text-white/20 text-[12px] text-center">
               © {new Date().getFullYear()} Code and Compute Society, Arka Jain University. All rights reserved.
             </div>
           </div>
