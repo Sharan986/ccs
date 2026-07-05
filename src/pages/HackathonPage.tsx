@@ -4,7 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import BlackHole from '../components/BlackHole';
 import { CCSLogo } from '../components/CCSLogo';
 
-const GOOGLE_SHEET_URL = 'https://script.google.com/macros/s/AKfycbwxDIlPjTl8RXp1ZP8LeRqiSgqtpNdt3CAZN-UcWfKcYnahMJnn07KeSLB7uR6Z8PVk/exec';
+const GOOGLE_SHEET_ID = import.meta.env.ENV_GOOGLE_SHEET_ID;
+const GOOGLE_SHEET_URL = `https://script.google.com/macros/s/${GOOGLE_SHEET_ID}/exec`;
 
 interface Member { name: string; phone: string; email: string; }
 const blank = (): Member => ({ name: '', phone: '', email: '' });
