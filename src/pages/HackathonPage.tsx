@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import BlackHole from '../components/BlackHole';
 import { CCSLogo } from '../components/CCSLogo';
 
-const GOOGLE_SHEET_ID = import.meta.env.ENV_GOOGLE_SHEET_ID;
+const GOOGLE_SHEET_ID = import.meta.env.VITE_GOOGLE_SHEET_ID;
 const GOOGLE_SHEET_URL = `https://script.google.com/macros/s/${GOOGLE_SHEET_ID}/exec`;
 
 interface Member { name: string; phone: string; email: string; }
@@ -45,7 +45,7 @@ function MemberRow({ title, data, onChange }: {
       <p style={{ margin: 0, fontSize: 10, letterSpacing: '0.16em', textTransform: 'uppercase', color: 'rgba(192,132,252,0.6)' }}>{title}</p>
       <Field label="Full Name" value={data.name} onChange={v => onChange('name', v)} placeholder="Full name" />
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-        <Field label="Phone" type="tel" value={data.phone} onChange={v => onChange('phone', v)} placeholder="+91 00000 00000" />
+        <Field label="Phone" type="tel" value={data.phone} onChange={v => onChange('phone', v)} placeholder="0000000000" />
         <Field label="Email" type="email" value={data.email} onChange={v => onChange('email', v)} placeholder="you@uni.edu" />
       </div>
     </div>
@@ -60,10 +60,10 @@ export default function HackathonPage() {
   const [step, setStep] = useState(-1); // -1 = pre-start, 0..3 = form steps, 4 = success
   const [dir, setDir] = useState(1);
   const [form, setForm] = useState({
-    teamName: '', collegeName: '',
+    teamName: '', collegeName: 'Arka Jain University',
     leader: blank(),
     m1: blank(), m2: blank(), m3: blank(),
-    extraCount: 1,
+    extraCount: 0,
   });
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -73,6 +73,24 @@ export default function HackathonPage() {
   const setLeader = (f: keyof Member, v: string) => setForm(p => ({ ...p, leader: { ...p.leader, [f]: v } }));
   const setM = (which: 'm1' | 'm2' | 'm3', f: keyof Member, v: string) =>
     setForm(p => ({ ...p, [which]: { ...p[which], [f]: v } }));
+
+  const isValidMember = (m: Member) => {
+    const isPhoneValid = /^\d+$/.test(m.phone);
+    const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(m.email);
+    return m.name.trim() !== '' && isPhoneValid && isEmailValid;
+  };
+
+  const isStepValid = () => {
+    if (step === 0) return form.teamName.trim() !== '';
+    if (step === 1) return isValidMember(form.leader);
+    if (step === 2) {
+      if (form.extraCount >= 1 && !isValidMember(form.m1)) return false;
+      if (form.extraCount >= 2 && !isValidMember(form.m2)) return false;
+      if (form.extraCount >= 3 && !isValidMember(form.m3)) return false;
+      return true;
+    }
+    return true;
+  };
 
   const submit = async () => {
     setSubmitting(true); setError(null);
@@ -124,13 +142,13 @@ export default function HackathonPage() {
         <div>
           <h3 style={{ margin: '0 0 6px', fontSize: 18, fontWeight: 300, color: '#fff' }}>Registered!</h3>
           <p style={{ margin: 0, fontSize: 12, color: 'rgba(255,255,255,0.4)', lineHeight: 1.6 }}>
-            <strong style={{ color: 'rgba(255,255,255,0.7)' }}>{form.teamName}</strong> is in.<br />
-            Check {form.leader.email} for confirmation.
+            Your response has been captured.<br />
+            You will receive a confirmation mail shortly.
           </p>
         </div>
         <div style={{ display: 'flex', gap: 8, marginTop: 4 }}>
           <button onClick={() => navigate('/')} style={ghostBtn}>Back to Home</button>
-          <button onClick={() => { setStep(-1); setForm({ teamName: '', collegeName: '', leader: blank(), m1: blank(), m2: blank(), m3: blank(), extraCount: 1 }); }} style={accentBtn}>
+          <button onClick={() => { setStep(-1); setForm({ teamName: '', collegeName: 'Arka Jain University', leader: blank(), m1: blank(), m2: blank(), m3: blank(), extraCount: 0 }); }} style={accentBtn}>
             New Registration
           </button>
         </div>
@@ -141,7 +159,6 @@ export default function HackathonPage() {
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
         <RowLabel n={1} label="Team Info" />
         <Field label="Team Name" value={form.teamName} onChange={v => setForm(p => ({ ...p, teamName: v }))} placeholder="Team Singularity" />
-        <Field label="College / University" value={form.collegeName} onChange={v => setForm(p => ({ ...p, collegeName: v }))} placeholder="Arka Jain University" />
       </div>
     );
 
@@ -157,7 +174,7 @@ export default function HackathonPage() {
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <RowLabel n={3} label="Additional Members" />
           <div style={{ display: 'flex', gap: 5, flexShrink: 0 }}>
-            {[1, 2, 3].map(n => (
+            {[0, 1, 2, 3].map(n => (
               <button key={n} type="button" onClick={() => setForm(p => ({ ...p, extraCount: n }))} style={{
                 width: 26, height: 26, borderRadius: 7, fontSize: 11, cursor: 'pointer',
                 fontFamily: '"Space Mono",monospace', transition: 'all 0.2s',
@@ -168,7 +185,7 @@ export default function HackathonPage() {
             ))}
           </div>
         </div>
-        <MemberRow title="Member 2" data={form.m1} onChange={(f, v) => setM('m1', f, v)} />
+        {form.extraCount >= 1 && <MemberRow title="Member 2" data={form.m1} onChange={(f, v) => setM('m1', f, v)} />}
         {form.extraCount >= 2 && <MemberRow title="Member 3" data={form.m2} onChange={(f, v) => setM('m2', f, v)} />}
         {form.extraCount >= 3 && <MemberRow title="Member 4" data={form.m3} onChange={(f, v) => setM('m3', f, v)} />}
       </div>
@@ -340,12 +357,20 @@ export default function HackathonPage() {
                     </button>
 
                     {step < 3 ? (
-                      <button onClick={() => go(step + 1)} style={accentBtn}>
+                      <button
+                        onClick={() => go(step + 1)}
+                        disabled={!isStepValid()}
+                        style={{ ...accentBtn, opacity: isStepValid() ? 1 : 0.5, cursor: isStepValid() ? 'pointer' : 'not-allowed' }}
+                      >
                         Next
                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
                       </button>
                     ) : (
-                      <button onClick={submit} disabled={submitting} style={{ ...accentBtn, opacity: submitting ? 0.65 : 1, cursor: submitting ? 'not-allowed' : 'pointer', minWidth: 90, justifyContent: 'center' }}>
+                      <button
+                        onClick={submit}
+                        disabled={submitting || !isStepValid()}
+                        style={{ ...accentBtn, opacity: (submitting || !isStepValid()) ? 0.65 : 1, cursor: (submitting || !isStepValid()) ? 'not-allowed' : 'pointer', minWidth: 90, justifyContent: 'center' }}
+                      >
                         {submitting
                           ? <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" style={{ animation: 'spin 1s linear infinite' }}><path d="M21 12a9 9 0 1 1-6.219-8.56" /></svg>
                           : null}

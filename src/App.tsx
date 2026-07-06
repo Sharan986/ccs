@@ -164,21 +164,25 @@ function App() {
 
     const STEP = 0.038;
     let active = false;
-    // completed=true after animation finishes — blocks re-locking during scrollTo animation
     let completed = false;
     let lastDir = 1;
 
     /* ── Per-frame detection via Lenis scroll event ──────────────
        Fires every RAF frame while Lenis is running. Stops Lenis
-       the instant the about section reaches ≥98% visibility,
-       even mid-momentum from a fast flick.                     ── */
-    const onLenisScroll = () => {
+       the instant the about section reaches ≥98% visibility.    ── */
+    const onLenisScroll = ({ direction }: { direction: number }) => {
+      // Track direction from Lenis for correct entry-side detection
+      if (direction !== 0) lastDir = direction;
+
       if (active || completed || !aboutRef.current) return;
       const rect = aboutRef.current.getBoundingClientRect();
       const vh = window.innerHeight;
       const visiblePx = Math.min(rect.bottom, vh) - Math.max(rect.top, 0);
       if (visiblePx / rect.height >= 0.98) {
         active = true;
+        // Start progress from the correct end based on entry direction:
+        // scrolling down → text comes from below → start at 0
+        // scrolling up   → text comes from above → start at 1
         aboutRaw.set(lastDir >= 0 ? 0 : 1);
         lenisRef.current?.stop();
       }
@@ -196,7 +200,7 @@ function App() {
       if (next >= 1 && lastDir > 0) {
         // Text scrolled off top → go to SOE IT
         active = false;
-        completed = true; // set BEFORE start() so onLenisScroll ignores the transition
+        completed = true;
         const soe = document.getElementById('soe-it');
         if (soe) lenisRef.current?.scrollTo(soe, { duration: 0.55 });
         lenisRef.current?.start();
@@ -210,7 +214,7 @@ function App() {
       }
     };
 
-    /* ── IO: reset completed when section fully leaves viewport ─── */
+    /* ── IO: reset state when section leaves viewport ─────────── */
     const io = new IntersectionObserver(
       ([entry]) => {
         if (!entry.isIntersecting) {
@@ -219,7 +223,7 @@ function App() {
           lenisRef.current?.start();
         }
       },
-      { threshold: 0 }
+      { threshold: 0.05 } // fires as soon as mostly out of view
     );
 
     const lenis = lenisRef.current;
