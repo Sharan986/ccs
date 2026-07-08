@@ -80,6 +80,7 @@ html.lenis, html.lenis body {
 
 /* ── Form Inputs ──────────────────────────────── */
 .form-input {
+  box-sizing: border-box;
   width: 100%;
   height: 56px;
   background: rgba(255, 255, 255, 0.04);
@@ -123,3 +124,174 @@ html.lenis, html.lenis body {
 .scroll-indicator {
   animation: pulse-down 2.5s ease-in-out infinite;
 }
+
+/* ── Member Card ──────────────────────────────── */
+.member-card {
+  position: relative;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  overflow: hidden;
+  cursor: pointer;
+  height: 110px;
+  transition: border-color 0.4s ease, box-shadow 0.4s ease, transform 0.4s ease;
+}
+
+.member-card:hover {
+  border-color: rgba(192, 132, 252, 0.35);
+  box-shadow: 0 8px 48px rgba(192, 132, 252, 0.12), 0 0 0 1px rgba(192, 132, 252, 0.1);
+  transform: translateY(-4px);
+}
+
+/* ── Card face (default visible content) */
+.member-card-face {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 24px 24px;
+  position: relative;
+  z-index: 1;
+  transition: opacity 0.35s ease, transform 0.35s ease;
+}
+
+.member-card:hover .member-card-face {
+  opacity: 0;
+  transform: translateY(-8px);
+  pointer-events: none;
+}
+
+/* Avatar ring */
+.member-avatar {
+  flex-shrink: 0;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(192, 132, 252, 0.25), rgba(129, 140, 248, 0.12));
+  border: 1px solid rgba(192, 132, 252, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 20px rgba(192, 132, 252, 0.08);
+  transition: box-shadow 0.4s ease;
+}
+.member-card:hover .member-avatar {
+  box-shadow: 0 0 32px rgba(192, 132, 252, 0.25);
+}
+
+.member-initial {
+  font-size: 13px;
+  letter-spacing: 0.12em;
+  color: rgba(192, 132, 252, 0.75);
+  font-family: "Space Mono", monospace;
+}
+
+.member-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+
+.member-name {
+  font-size: 15px;
+  color: #fff;
+  font-weight: 400;
+  margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.member-role {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.38);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+
+
+/* ── Hover overlay */
+.member-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 16px 20px;
+  background: linear-gradient(
+    145deg,
+    rgba(192, 132, 252, 0.12) 0%,
+    rgba(0, 0, 0, 0.80) 50%,
+    rgba(129, 140, 248, 0.08) 100%
+  );
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.38s ease, transform 0.38s ease;
+  z-index: 2;
+  border-radius: 20px;
+}
+
+.member-card:hover .member-overlay {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.member-overlay-name {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.92);
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+
+.member-overlay-role {
+  font-size: 10px;
+  color: rgba(192, 132, 252, 0.65);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  margin-bottom: 2px;
+}
+
+/* ── Social buttons row */
+.member-socials {
+  display: flex;
+  gap: 8px;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.social-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.55);
+  text-decoration: none;
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-family: "Space Mono", monospace;
+  transition: background 0.25s ease, border-color 0.25s ease, color 0.25s ease, box-shadow 0.25s ease, transform 0.2s ease;
+}
+
+.social-btn:hover {
+  background: rgba(192, 132, 252, 0.15);
+  border-color: rgba(192, 132, 252, 0.45);
+  color: rgba(192, 132, 252, 1);
+  box-shadow: 0 0 20px rgba(192, 132, 252, 0.2), inset 0 0 12px rgba(192, 132, 252, 0.05);
+  transform: translateY(-2px);
+}
+
+/* Staggered entry for social buttons inside the overlay */
+.member-card:hover .social-btn:nth-child(1) { transition-delay: 0.05s; }
+.member-card:hover .social-btn:nth-child(2) { transition-delay: 0.10s; }
+.member-card:hover .social-btn:nth-child(3) { transition-delay: 0.15s; }
