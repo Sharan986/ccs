@@ -155,63 +155,61 @@ function App() {
   // Manual progress: 0 = text below screen, 1 = text above screen
   const aboutRaw = useMotionValue(0);
   const aboutProgress = useSpring(aboutRaw, { stiffness: 80, damping: 22, mass: 0.6 });
+  // Y-range computed at render — updated on resize via the effect
   const yMotionValue = useTransform(aboutProgress, [0, 1], [500, -460]);
   const aboutOpacity = useTransform(aboutProgress, [0, 0.07, 0.88, 1], [0, 1, 1, 0]);
   const transformTpl = useMotionTemplate`rotateX(28deg) translateY(${yMotionValue}px) translateZ(10px)`;
 
   useEffect(() => {
     if (!entranceComplete) return;
+    // Scroll-lock is desktop/trackpad only — skip on touch/small devices
+    if (window.innerWidth < 768) return;
 
-    const STEP = 0.038;
+    const WHEEL_SCALE = 1 / 300;
     let active = false;
     let completed = false;
     let lastDir = 1;
+
+    const advanceProgress = (delta: number) => {
+      const next = Math.min(1, Math.max(0, aboutRaw.get() + delta));
+      aboutRaw.set(next);
+      if (next >= 1 && lastDir > 0) {
+        active = false; completed = true;
+        const soe = document.getElementById('soe-it');
+        if (soe) lenisRef.current?.scrollTo(soe, { duration: 0.55 });
+        lenisRef.current?.start();
+      } else if (next <= 0 && lastDir < 0) {
+        active = false; completed = true;
+        const home = document.getElementById('home');
+        if (home) lenisRef.current?.scrollTo(home, { duration: 0.55 });
+        lenisRef.current?.start();
+      }
+    };
 
     /* ── Per-frame detection via Lenis scroll event ──────────────
        Fires every RAF frame while Lenis is running. Stops Lenis
        the instant the about section reaches ≥98% visibility.    ── */
     const onLenisScroll = ({ direction }: { direction: number }) => {
-      // Track direction from Lenis for correct entry-side detection
       if (direction !== 0) lastDir = direction;
-
       if (active || completed || !aboutRef.current) return;
       const rect = aboutRef.current.getBoundingClientRect();
       const vh = window.innerHeight;
       const visiblePx = Math.min(rect.bottom, vh) - Math.max(rect.top, 0);
       if (visiblePx / rect.height >= 0.98) {
         active = true;
-        // Start progress from the correct end based on entry direction:
-        // scrolling down → text comes from below → start at 0
-        // scrolling up   → text comes from above → start at 1
         aboutRaw.set(lastDir >= 0 ? 0 : 1);
         lenisRef.current?.stop();
       }
     };
 
-    /* ── Wheel handler: tracks direction + drives progress ──────── */
+    /* ── Wheel: normalize deltaY so touchpad & mouse feel alike ─
+       Clamp per-event to ±80px so one fast tick can't skip >27%. ── */
     const onWheel = (e: WheelEvent) => {
       lastDir = Math.sign(e.deltaY) || lastDir;
       if (!active) return;
-
       e.preventDefault();
-      const next = Math.min(1, Math.max(0, aboutRaw.get() + lastDir * STEP));
-      aboutRaw.set(next);
-
-      if (next >= 1 && lastDir > 0) {
-        // Text scrolled off top → go to SOE IT
-        active = false;
-        completed = true;
-        const soe = document.getElementById('soe-it');
-        if (soe) lenisRef.current?.scrollTo(soe, { duration: 0.55 });
-        lenisRef.current?.start();
-      } else if (next <= 0 && lastDir < 0) {
-        // Scrolled back to start → go to hero
-        active = false;
-        completed = true;
-        const home = document.getElementById('home');
-        if (home) lenisRef.current?.scrollTo(home, { duration: 0.55 });
-        lenisRef.current?.start();
-      }
+      const clamped = Math.max(-80, Math.min(80, e.deltaY));
+      advanceProgress(clamped * WHEEL_SCALE);
     };
 
     /* ── IO: reset state when section leaves viewport ─────────── */
@@ -223,7 +221,7 @@ function App() {
           lenisRef.current?.start();
         }
       },
-      { threshold: 0.05 } // fires as soon as mostly out of view
+      { threshold: 0.05 }
     );
 
     const lenis = lenisRef.current;
@@ -346,7 +344,7 @@ function App() {
           <h2
             className="uppercase font-['Anton_SC'] whitespace-nowrap leading-none select-none opacity-[0.07]"
             style={{
-              fontSize: 'clamp(120px, 30vw, 521px)', letterSpacing: '50px',
+              fontSize: 'clamp(80px, 25vw, 521px)', letterSpacing: 'clamp(8px, 3vw, 50px)',
               background: 'radial-gradient(circle, rgba(142,127,148,0) 0%, #8E7F94 70%)',
               backgroundClip: 'text', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', color: 'transparent',
               willChange: 'opacity',
@@ -420,23 +418,31 @@ function App() {
         <div
           className="relative z-20 w-full max-w-5xl mx-auto flex items-center justify-center"
           style={{
-            paddingLeft: 'clamp(24px, 6vw, 96px)',
-            paddingRight: 'clamp(24px, 6vw, 96px)',
+            paddingLeft: 'clamp(20px, 6vw, 96px)',
+            paddingRight: 'clamp(20px, 6vw, 96px)',
             transformStyle: 'preserve-3d',
-            perspective: '220px',
+            perspective: 'clamp(120px, 15vw, 220px)',
           }}
         >
+          {/* Desktop: scroll-driven 3D animation */}
           <motion.div
             style={{
               transformStyle: 'preserve-3d',
               transform: transformTpl,
               opacity: aboutOpacity,
-              fontSize: 'clamp(22px, 3.6vw, 44px)',
+              fontSize: 'clamp(16px, 3.2vw, 44px)',
             }}
-            className="text-center font-bold tracking-tighter text-white font-sans leading-[1.3] select-none w-full"
+            className="text-center font-bold tracking-tighter text-white font-sans leading-[1.35] select-none w-full hidden md:block"
           >
             Code and Compute Society is a student-led engineering collective at Arka Jain University. We transform raw curiosity into technical fluency — through hackathons, workshops, open-source contributions, and peer-driven learning. Every line of code is a signal. We make it count.
           </motion.div>
+          {/* Mobile: plain static text — no scroll-lock */}
+          <p
+            className="text-center font-bold tracking-tighter text-white font-sans leading-[1.5] select-none w-full block md:hidden"
+            style={{ fontSize: 'clamp(14px, 4.2vw, 20px)', padding: '0 4px' }}
+          >
+            Code and Compute Society is a student-led engineering collective at Arka Jain University. We transform raw curiosity into technical fluency — through hackathons, workshops, open-source contributions, and peer-driven learning. Every line of code is a signal. We make it count.
+          </p>
         </div>
       </section>
 
@@ -493,7 +499,7 @@ function App() {
             viewport={{ once: true, amount: 0.3 }}
             transition={{ duration: 0.8, delay: 0.4 }}
             className="glass-panel w-full text-center"
-            style={{ padding: '32px 40px' }}
+            style={{ padding: 'clamp(20px, 4vw, 32px) clamp(16px, 5vw, 40px)' }}
           >
             <div className="text-white/50 leading-relaxed" style={{ fontSize: 'clamp(13px, 1.3vw, 15px)' }}>
               <ScrambledText duration={2.5} delay={800} speed={0.8} radius={60} triggered={soeDescInView} className="inline-block">
@@ -505,7 +511,7 @@ function App() {
       </section>
 
       {/* ═══════════════════ 4 · MEMBERS ════════════════════════ */}
-      <section id="members" className="w-full bg-black flex flex-col items-center justify-center" style={{ minHeight: '100dvh', padding: 'clamp(60px, 8vh, 100px) 0' }}>
+      <section id="members" className="w-full bg-black flex flex-col items-center justify-center" style={{ minHeight: '100svh', padding: 'clamp(48px, 8vh, 100px) 0' }}>
         <div className="w-full flex flex-col items-center gap-12" style={{ maxWidth: 1200, padding: '0 clamp(20px, 5vw, 40px)' }}>
           {/* Heading block */}
           <motion.div
@@ -531,17 +537,32 @@ function App() {
             viewport={{ once: true, amount: 0.1 }}
             transition={{ duration: 0.9, delay: 0.2 }}
             className="w-full"
-            style={{ minHeight: 520 }}
+            style={{ minHeight: 'clamp(320px, 50vh, 520px)' }}
           >
-            <ChromaGrid
-              items={MEMBERS}
-              radius={320}
-              damping={0.45}
-              fadeOut={0.6}
-              ease="power3.out"
-              columns={3}
-              rows={2}
-            />
+            {/* Desktop: 3-col ChromaGrid */}
+            <div className="hidden sm:block w-full h-full">
+              <ChromaGrid
+                items={MEMBERS}
+                radius={320}
+                damping={0.45}
+                fadeOut={0.6}
+                ease="power3.out"
+                columns={3}
+                rows={2}
+              />
+            </div>
+            {/* Mobile: 2-col ChromaGrid */}
+            <div className="block sm:hidden w-full h-full">
+              <ChromaGrid
+                items={MEMBERS}
+                radius={180}
+                damping={0.45}
+                fadeOut={0.6}
+                ease="power3.out"
+                columns={2}
+                rows={3}
+              />
+            </div>
           </motion.div>
         </div>
       </section>
@@ -589,7 +610,7 @@ function App() {
                 viewport={{ once: true, amount: 0.1 }}
                 transition={{ duration: 0.6, delay: 0.1 + i * 0.08 }}
                 className="glass-panel glass-panel-hover accent-left-border flex flex-col gap-2"
-                style={{ padding: '24px 28px', minHeight: 150 }}
+                style={{ padding: 'clamp(16px, 3vw, 24px) clamp(16px, 4vw, 28px)', minHeight: 130 }}
               >
                 <span
                   className="uppercase tracking-[0.14em]"
@@ -654,7 +675,7 @@ function App() {
       </section>
 
       {/* ═══════════════════ 7 · SUGGESTIONS ════════════════════ */}
-      <section id="suggestions" className="relative w-full min-h-screen bg-black flex flex-col items-center justify-center py-28 sm:py-32 overflow-hidden pointer-events-none">
+      <section id="suggestions" className="relative w-full min-h-screen bg-black flex flex-col items-center justify-center py-16 sm:py-24 overflow-hidden pointer-events-none">
         <div className="absolute inset-0 z-0 pointer-events-auto">
           <Galaxy />
         </div>
@@ -698,7 +719,7 @@ function App() {
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ duration: 0.4 }}
                 className="glass-panel w-full max-w-lg pointer-events-auto"
-                style={{ padding: '36px 40px 40px', marginTop: 64 }}
+                style={{ padding: 'clamp(20px, 4vw, 36px) clamp(16px, 5vw, 40px)', marginTop: 'clamp(24px, 5vh, 64px)' }}
               >
                 <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -752,7 +773,7 @@ function App() {
       <footer className="w-full bg-black overflow-hidden border-t border-white/[0.06]">
         <div className="flex flex-col md:flex-row min-h-[400px]">
           {/* Left: video */}
-          <div className="w-full md:w-1/2 h-[300px] md:h-auto relative">
+          <div className="w-full md:w-1/2 h-[220px] sm:h-[280px] md:h-auto relative">
             <video src={FOOTER_VID} autoPlay muted loop playsInline className="absolute inset-0 w-full h-full object-cover" />
           </div>
 

@@ -18,7 +18,7 @@ const NAV_LINKS = [
   { label: 'Suggestions', target: 'suggestions' },
 ];
 
-const SIDE_PAD = 'clamp(20px, 5vw, 80px)';
+const SIDE_PAD = 'clamp(12px, 4vw, 80px)';
 
 export const Navbar: React.FC<NavbarProps> = ({ entranceComplete }) => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -57,7 +57,7 @@ export const Navbar: React.FC<NavbarProps> = ({ entranceComplete }) => {
 
         {/* Expanding menu pill — grows to the right from a fixed left edge */}
         <motion.div
-          animate={{ width: menuOpen ? 'clamp(300px, 50vw, 600px)' : 40 }}
+          animate={{ width: menuOpen ? 'clamp(240px, 48vw, 600px)' : 40 }}
           transition={spring}
           className="h-10 bg-white/12 backdrop-blur-md rounded-xl flex items-center overflow-hidden flex-shrink-0"
           style={{ willChange: 'width', originX: 0 }}
@@ -100,9 +100,9 @@ export const Navbar: React.FC<NavbarProps> = ({ entranceComplete }) => {
 
       {/* ── Right: CTA buttons ────────────────────────────────── */}
       <div className="pointer-events-auto flex items-center gap-2 flex-shrink-0">
-        {/* Hackathon button */}
+        {/* Hackathon button — hidden on very small screens */}
         <motion.button
-          className="h-10 rounded-full flex items-center justify-center gap-2 font-medium text-[13px] whitespace-nowrap"
+          className="hidden sm:flex h-10 rounded-full items-center justify-center gap-2 font-medium text-[13px] whitespace-nowrap"
           style={{
             paddingLeft: 20, paddingRight: 20,
             background: 'linear-gradient(135deg, rgba(192,132,252,0.18), rgba(129,140,248,0.14))',
@@ -128,7 +128,7 @@ export const Navbar: React.FC<NavbarProps> = ({ entranceComplete }) => {
         {/* Join CCS button */}
         <motion.button
           className="h-10 bg-white rounded-full flex items-center justify-center gap-2 text-black font-medium text-[13px] whitespace-nowrap"
-          style={{ paddingLeft: 20, paddingRight: 20 }}
+          style={{ paddingLeft: 'clamp(12px, 2vw, 20px)', paddingRight: 'clamp(12px, 2vw, 20px)' }}
           whileHover={{ scale: 1.04, backgroundColor: '#e8e8ec' }}
           whileTap={{ scale: 0.96 }}
           onMouseEnter={() => setHoverJoin(true)}
